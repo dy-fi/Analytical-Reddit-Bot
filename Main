@@ -1,7 +1,7 @@
 import praw
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 import probablepeople as pp
-import re
+
 
 '''
 PRAW:
@@ -16,12 +16,13 @@ Probablepeople:
 http://probablepeople.readthedocs.io/en/latest/#
 '''
 
-reddit = praw.Reddit(client_id='suTofAZW044xpQ',
-                     client_secret="dbdHy3rsCXOgQkL147A7D0KuhHI", password='1efe99',
-                     user_agent='Hail Corporate Bot', username='Hail_Corporate_Bot_')
+reddit = praw.Reddit(client_id='',
+                     client_secret="", password='',
+                     user_agent='', username='')
 
 top100 = reddit.subreddit('all').hot(limit=100)
 analyze = SentimentIntensityAnalyzer()
+
 
 def findnth(haystack, needle, n):
     parts= haystack.split(needle, n+1)
@@ -32,7 +33,6 @@ def findnth(haystack, needle, n):
 
 def nameparse(name):
     if "corporation" in pp.tag(name):
-        a = re.search(r'CorporationName', pp.tag(name))
         return pp.tag(name)[findnth(pp.tag(name), '\'', 3):findnth(pp.tag(name), '\'', 4)]
     else:
         return -1
@@ -48,9 +48,6 @@ for submission in top100:
             print(nameparse(word))
 
     print(submission.ups)
-    print(submission.downs)
     print(submission.id)
     print(submission.shortlink)
     print('\n')
-
-
