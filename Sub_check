@@ -1,0 +1,27 @@
+import praw
+import probablepeople as pp
+reddit = praw.Reddit(client_id='suTofAZW044xpQ',
+                     client_secret="dbdHy3rsCXOgQkL147A7D0KuhHI", password='1efe99',
+                     user_agent='Hail Corporate Bot', username='Hail_Corporate_Bot_')
+
+top100 = reddit.subreddit('all').hot(limit=100)
+
+f = open("dump.txt", "w+", errors='ignore')
+
+def all_occurences(file, str):
+    initial = 0
+    while True:
+        initial = file.find(str, initial)
+        if initial == -1: return
+        yield initial
+        initial += len(str)
+
+def sub_Check():
+    for submission in top100:
+        subt = ''.join(str(x) for x in pp.parse(submission.title))
+        f.write(subt)
+
+    if "Corporation" in open("dump.txt").read():
+        print(f.index("Corporation"))
+
+sub_Check()
