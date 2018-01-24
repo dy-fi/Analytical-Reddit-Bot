@@ -1,6 +1,5 @@
 import praw
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-import probablepeople as pp
 
 
 '''
@@ -12,42 +11,26 @@ Hutto, C.J. & Gilbert, E.E. (2014). VADER: A Parsimonious Rule-based Model for
 Sentiment Analysis of Social Media Text. Eighth International Conference on
 Weblogs and Social Media (ICWSM-14). Ann Arbor, MI, June 2014.
 
-Probablepeople:
-http://probablepeople.readthedocs.io/en/latest/#
+
 '''
 
-reddit = praw.Reddit(client_id='',
-                     client_secret="", password='',
-                     user_agent='', username='')
+reddit = praw.Reddit(client_id='suTofAZW044xpQ',
+                     client_secret="dbdHy3rsCXOgQkL147A7D0KuhHI", password='1efe99',
+                     user_agent='Hail Corporate Bot', username='Hail_Corporate_Bot_')
+
 
 top100 = reddit.subreddit('all').hot(limit=100)
 analyze = SentimentIntensityAnalyzer()
-
-
-def findnth(haystack, needle, n):
-    parts= haystack.split(needle, n+1)
-    if len(parts)<=n+1:
-        return -1
-    return len(haystack)-len(parts[-1])-len(needle)
-
-
-def nameparse(name):
-    if "corporation" in pp.tag(name):
-        return pp.tag(name)[findnth(pp.tag(name), '\'', 3):findnth(pp.tag(name), '\'', 4)]
-    else:
-        return -1
 
 
 for submission in top100:
     IS = analyze.polarity_scores(submission.title)
     print(submission.title)
     print("Intensity ratings: {}".format(IS))
-
-    for word in submission.title:
-        if nameparse(word) != -1:
-            print(nameparse(word))
-
     print(submission.ups)
     print(submission.id)
     print(submission.shortlink)
     print('\n')
+
+
+
