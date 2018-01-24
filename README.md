@@ -1,2 +1,2 @@
-# Analytical-Reddit-Bot
-A bot that collects data, such as sentiment analysis, of the top 100 posts on reddit
+# HC_Bot
+A bot that finds posts that are possibly covert advertisements and posts ones it find particularly egregious (based sentiment analysis and upvote ratios) to r/Hail_Corporate
