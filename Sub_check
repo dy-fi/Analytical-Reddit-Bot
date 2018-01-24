@@ -1,5 +1,4 @@
 import praw
-import probablepeople as pp
 reddit = praw.Reddit(client_id='suTofAZW044xpQ',
                      client_secret="dbdHy3rsCXOgQkL147A7D0KuhHI", password='1efe99',
                      user_agent='Hail Corporate Bot', username='Hail_Corporate_Bot_')
@@ -7,6 +6,7 @@ reddit = praw.Reddit(client_id='suTofAZW044xpQ',
 top100 = reddit.subreddit('all').hot(limit=100)
 
 f = open("dump.txt", "w+", errors='ignore')
+
 
 def all_occurences(file, str):
     initial = 0
@@ -16,12 +16,16 @@ def all_occurences(file, str):
         yield initial
         initial += len(str)
 
-def sub_Check():
+def sub_check():
     for submission in top100:
-        subt = ''.join(str(x) for x in pp.parse(submission.title))
-        f.write(subt)
 
-    if "Corporation" in open("dump.txt").read():
-        print(f.index("Corporation"))
+        #gensim implementation to check similarity in words in titles vs. company names from a list
 
-sub_Check()
+        f.write()
+
+    print(list(all_occurences(open("dump.txt").read(), "CorporationName")))
+
+
+sub_check()
+f.close()
+
