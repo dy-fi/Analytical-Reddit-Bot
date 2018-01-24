@@ -28,7 +28,20 @@ def linefind(lookup):
             else:
                 return -1
 
+
 for submission in top100:
     for word in submission.title:
         if linefind(word) != -1:
             idlist.append(submission.id)
+
+
+for x in range(0, len(idlist)):
+        submission = reddit.submission(id=idlist[x])
+        IS = analyze.polarity_scores(submission.title)
+        print(submission.title)
+        print("Intensity ratings: {}".format(IS))
+        print(submission.ups)
+        print(submission.id)
+        print(submission.shortlink)
+        print('\n')
+
