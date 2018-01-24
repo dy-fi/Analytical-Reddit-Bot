@@ -3,7 +3,7 @@ from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
 
 reddit = praw.Reddit(client_id='suTofAZW044xpQ',
-                     client_secret="dbdHy3rsCXOgQkL147A7D0KuhHI", password='1efe99',
+                     client_secret="", password='',
                      user_agent='Hail Corporate Bot', username='Hail_Corporate_Bot_')
 
 top100 = reddit.subreddit('all').hot(limit=100)
