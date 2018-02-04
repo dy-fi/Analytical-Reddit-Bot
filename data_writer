@@ -1,0 +1,67 @@
+import praw
+import tablib
+import pytesseract
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+import io
+import requests
+from PIL import Image
+
+
+reddit = praw.Reddit(client_id='suTofAZW044xpQ',
+                     client_secret="dbdHy3rsCXOgQkL147A7D0KuhHI", password='1efe99',
+                     user_agent='Hail Corporate Bot', username='Hail_Corporate_Bot_')
+
+
+top100 = reddit.subreddit('all').hot(limit=100)
+analyze = SentimentIntensityAnalyzer()
+
+#Tesseract path option
+pytesseract.pytesseract.tesseract_cmd = 'D:\TesseractOCR\Tesseract-OCR\Tesseract'
+
+#dataset creation and loading
+data = tablib.Dataset()
+data.headers = ['Title','Intensity','Upvotes','Up_ratio']
+titles = []
+intensity = []
+upvotes = []
+Up_ratio = []
+Imagetext = []
+
+
+for submission in top100:
+#title feature, possible Levenshtein implementation eventually
+    titles.append(submission.title)
+#intensity feature
+    IS = analyze.polarity_scores(submission.title)
+    intensity.append(IS)
+#upvoting features
+    upvotes.append(submission.ups)
+    Up_ratio.append(submission.upvote_ratio)
+
+#image catching, conversion, and encapsulation
+    try:
+        test = requests.get(submission.url)
+        test.raise_for_status()
+    except requests.exceptions.Timeout:
+        print("Timeout")
+    except requests.exceptions.TooManyRedirects:
+        print("Bad URL")
+    except requests.exceptions.RequestException as e:
+        print("Critical ", e)
+
+    post = requests.get(submission.url)
+    pic = Image.open(io.BytesIO(post.content))
+    pictext = pytesseract.image_to_string(pic)
+    Imagetext.append(pictext)
+
+    print('\n')
+
+data.append(titles)
+data.append(intensity)
+data.append(upvotes)
+data.append(Up_ratio)
+data.append(Imagetext)
+
+#because of how data is read in binary in csv format, specifying this is very important
+with open('D:\Coding Projects\HC_Bot\post_data.csv') as p:
+    p.write(data.csv)
