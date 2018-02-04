@@ -7,9 +7,9 @@ import requests
 from PIL import Image
 
 
-reddit = praw.Reddit(client_id='suTofAZW044xpQ',
-                     client_secret="dbdHy3rsCXOgQkL147A7D0KuhHI", password='1efe99',
-                     user_agent='Hail Corporate Bot', username='Hail_Corporate_Bot_')
+reddit = praw.Reddit(client_id='',
+                     client_secret="", password='',
+                     user_agent='Hail Corporate Bot', username='')
 
 
 top100 = reddit.subreddit('all').hot(limit=100)
@@ -63,5 +63,5 @@ data.append(Up_ratio)
 data.append(Imagetext)
 
 #because of how data is read in binary in csv format, specifying this is very important
-with open('D:\Coding Projects\HC_Bot\post_data.csv') as p:
+with open('D:\Coding Projects\HC_Bot\post_data.csv','wb') as p:
     p.write(data.csv)
