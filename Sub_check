@@ -1,47 +1,37 @@
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import praw
-from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+import tablib
+import tensorflow.contrib.learn as tf
 
-
-reddit = praw.Reddit(client_id='suTofAZW044xpQ',
+#reddit object
+reddit = praw.Reddit(client_id='',
                      client_secret="", password='',
-                     user_agent='Hail Corporate Bot', username='Hail_Corporate_Bot_')
+                     user_agent='', username='')
 
-top100 = reddit.subreddit('all').hot(limit=100)
+#model specification
+classifier = tf.TensorFlowLinearClassifier(n_classes=3)
 
-r = open("complist.txt")
-analyze = SentimentIntensityAnalyzer()
-idlist= []
+#training set pipe objects and metadata
+training = "D:\Coding Projects\HC_Bot\post_data.csv"
+ds = tf.data.TextLineDataset(training).skip(1)
+meta = ['Title', 'Intensity', 'Upvotes', 'Upvote Ratio', 'Image text','label']
+defaults = [[""], [0.0], [0], [0.0], [""], [""]]
 
-def all_occurences(file, str):
-    initial = 0
-    while True:
-        initial = file.find(str, initial)
-        if initial == -1: return
-        yield initial
-        initial += len(str)
+def parser(line):
+#csv parsing and formatting
+    fields = tf.decode_csv(line, defaults)
+    features = dict(zip(meta,fields))
 
-def linefind(lookup):
-    with open('D:\Coding Projects\HC_Bot\complist.txt') as myFile:
-        for num, line in enumerate(myFile, 1):
-            if lookup in line:
-                return num
-            else:
-                return -1
+#isolate the label field and assign a variable to hold this
+    label = features.pop('label')
+
+    return features, label
 
 
-for submission in top100:
-    for word in submission.title:
-        if linefind(word) != -1:
-            idlist.append(submission.id)
+ds = ds.map(parser)
 
 
-for x in range(0, len(idlist)):
-        submission = reddit.submission(id=idlist[x])
-        IS = analyze.polarity_scores(submission.title)
-        print(submission.title)
-        print("Intensity ratings: {}".format(IS))
-        print(submission.ups)
-        print(submission.id)
-        print(submission.shortlink)
-        print('\n')
 
