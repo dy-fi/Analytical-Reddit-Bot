@@ -4,41 +4,41 @@ import pytesseract
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 import io
 import requests
+from bs4 import BeautifulSoup
 from PIL import Image
-
 
 reddit = praw.Reddit(client_id='',
                      client_secret="", password='',
-                     user_agent='Hail Corporate Bot', username='')
-
+                     user_agent='', username='')
 
 top100 = reddit.subreddit('all').hot(limit=100)
 analyze = SentimentIntensityAnalyzer()
 
-#Tesseract path option
+# Tesseract path option
 pytesseract.pytesseract.tesseract_cmd = 'D:\TesseractOCR\Tesseract-OCR\Tesseract'
 
-#dataset creation and loading
+# dataset creation and loading
 data = tablib.Dataset()
-data.headers = ['Title','Intensity','Upvotes','Up_ratio']
+data.headers = ['Title', 'Intensity', 'Upvotes', 'Up_ratio']
 titles = []
 intensity = []
 upvotes = []
 Up_ratio = []
 Imagetext = []
 
-
 for submission in top100:
-#title feature, possible Levenshtein implementation eventually
+
+    # title feature, possible Levenshtein implementation eventually to catch intentionally mispelled company names
     titles.append(submission.title)
-#intensity feature
+    # intensity feature
     IS = analyze.polarity_scores(submission.title)
     intensity.append(IS)
-#upvoting features
+    # upvoting features
     upvotes.append(submission.ups)
     Up_ratio.append(submission.upvote_ratio)
 
-#image catching, conversion, and encapsulation
+    # image features
+    # catching, conversion, and encapsulation
     try:
         test = requests.get(submission.url)
         test.raise_for_status()
@@ -49,11 +49,13 @@ for submission in top100:
     except requests.exceptions.RequestException as e:
         print("Critical ", e)
 
-    post = requests.get(submission.url)
-    pic = Image.open(io.BytesIO(post.content))
-    pictext = pytesseract.image_to_string(pic)
-    Imagetext.append(pictext)
-
+    # Parsing HTML with BS4, Checking, and conversion
+    if "/i.imgur.com/" in submission.title:
+        pic = Image.open(submission.url)
+        pictext = io.BytesIO(pytesseract.image_to_string(pic))
+        Imagetext.append(pictext)
+    else:
+        Imagetext.append("n")
     print('\n')
 
 data.append(titles)
@@ -62,6 +64,6 @@ data.append(upvotes)
 data.append(Up_ratio)
 data.append(Imagetext)
 
-#because of how data is read in binary in csv format, specifying this is very important
-with open('D:\Coding Projects\HC_Bot\post_data.csv','wb') as p:
+# data is read into csv in binary
+with open('D:\Coding Projects\HC_Bot\post_data.csv', 'wb') as p:
     p.write(data.csv)
